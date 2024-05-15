@@ -143,6 +143,39 @@ void AIPlayer::thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const
     }
 }
 
+double AIPlayer::Poda_AlfaBeta(const Parchis &actual, int jugador, int profundidad, int profundidad_max, color &c_piece, int &id_piece, int &dice, double alpha, double beta, double (*heuristic)(const Parchis &, int)) const
+{
+    if (profundidad == profundidad_max || actual.gameOver())
+        return heuristic(actual, jugador);
+
+    ParchisBros hijos = actual.getChildren();
+    if (jugador == 0)
+    {
+        double v = menosinf;
+        for (ParchisBros::Iterator it = hijos.begin(); it != hijos.end(); ++it)
+        {
+            v = max(v, Poda_AlfaBeta(*it, 1, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic));
+            alpha = max(alpha, v);
+            
+            if (alpha >= beta)
+                break;
+        }
+        return v;
+    }
+    else
+    {
+        double v = masinf;
+        for (ParchisBros::Iterator it = hijos.begin(); it != hijos.end(); ++it)
+        {
+            v = min(v, Poda_AlfaBeta(*it, 0, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic));
+            beta = min(beta, v);
+            if (alpha >= beta)
+                break;
+        }
+        return v;
+    }
+}
+
 void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
 {
     switch (id)
