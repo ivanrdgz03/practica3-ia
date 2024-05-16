@@ -143,37 +143,51 @@ void AIPlayer::thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const
     }
 }
 
-double AIPlayer::Poda_AlfaBeta(const Parchis &actual, int jugador, int profundidad, int profundidad_max, color &c_piece, int &id_piece, int &dice, double alpha, double beta, double (*heuristic)(const Parchis &, int)) const
+void AIPlayer::thinkAlfaBeta(color &c_piece, int &id_piece, int &dice) const
+{
+    Poda_AlfaBeta(*actual, jugador, 0, PROFUNDIDAD_ALFABETA, c_piece, id_piece, dice, menosinf, masinf, ValoracionTest);
+}
+
+double AIPlayer::Poda_AlfaBeta(const Parchis &actual, const int &jugador, const int &profundidad, const int &profundidad_max, color &c_piece, int &id_piece, int &dice, double alpha, double beta, double (*heuristic)(const Parchis &, int)) const
 {
     if (profundidad == profundidad_max || actual.gameOver())
         return heuristic(actual, jugador);
-
+    double salida = menosinf;
     ParchisBros hijos = actual.getChildren();
-    if (jugador == 0)
-    {
-        double v = menosinf;
+    if (jugador == actual.getCurrentPlayerId())
         for (ParchisBros::Iterator it = hijos.begin(); it != hijos.end(); ++it)
         {
-            v = max(v, Poda_AlfaBeta(*it, 1, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic));
-            alpha = max(alpha, v);
-            
+            double aux = Poda_AlfaBeta(*it, jugador, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic);
+
+            if (aux > salida)
+            {
+                salida = aux;
+                if (profundidad == 0)
+                {
+                    c_piece = it.getMovedColor();
+                    id_piece = it.getMovedPieceId();
+                    dice = it.getMovedDiceValue();
+                }
+            }
+
+            alpha = max(alpha, salida);
             if (alpha >= beta)
                 break;
         }
-        return v;
-    }
+
     else
     {
-        double v = masinf;
+        salida = masinf;
         for (ParchisBros::Iterator it = hijos.begin(); it != hijos.end(); ++it)
         {
-            v = min(v, Poda_AlfaBeta(*it, 0, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic));
-            beta = min(beta, v);
+            double aux = Poda_AlfaBeta(*it, jugador, profundidad + 1, profundidad_max, c_piece, id_piece, dice, alpha, beta, heuristic);
+            salida = min(aux, salida);
+            beta = min(beta, salida);
             if (alpha >= beta)
                 break;
         }
-        return v;
     }
+    return salida;
 }
 
 void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
@@ -188,7 +202,8 @@ void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
         thinkAleatorioMasInteligente(c_piece, id_piece, dice);
         break;
     case 2:
-        thinkFichaMasAdelantada(c_piece, id_piece, dice);
+        thinkAlfaBeta(c_piece, id_piece, dice);
+        // thinkFichaMasAdelantada(c_piece, id_piece, dice);
         break;
     case 3:
         thinkMejorOpcion(c_piece, id_piece, dice);
