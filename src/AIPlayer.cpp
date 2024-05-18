@@ -220,13 +220,9 @@ double AIPlayer::ValoracionTest(const Parchis &estado, int jugador)
 
     // Si hay un ganador, devuelvo más/menos infinito, según si he ganado yo o el oponente.
     if (ganador == jugador)
-    {
         return gana;
-    }
     else if (ganador == oponente)
-    {
         return pierde;
-    }
     else
     {
         // Colores que juega mi jugador y colores del oponente
@@ -244,13 +240,9 @@ double AIPlayer::ValoracionTest(const Parchis &estado, int jugador)
             {
                 // Valoro positivamente que la ficha esté en casilla segura o meta.
                 if (estado.isSafePiece(c, j))
-                {
                     puntuacion_jugador++;
-                }
                 else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
-                {
                     puntuacion_jugador += 5;
-                }
             }
         }
 
@@ -262,17 +254,12 @@ double AIPlayer::ValoracionTest(const Parchis &estado, int jugador)
             color c = op_colors[i];
             // Recorro las fichas de ese color.
             for (int j = 0; j < num_pieces; j++)
-            {
                 if (estado.isSafePiece(c, j))
-                {
                     // Valoro negativamente que la ficha esté en casilla segura o meta.
                     puntuacion_oponente++;
-                }
                 else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
-                {
                     puntuacion_oponente += 5;
-                }
-            }
+
         }
 
         // Devuelvo la puntuación de mi jugador menos la puntuación del oponente.
