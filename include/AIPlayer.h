@@ -84,5 +84,7 @@ public:
     void thinkFichaMasAdelantada(color &c_piece, int &id_piece, int &dice) const;
     void thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const;
     void thinkAlfaBeta(color &c_piece, int &id_piece, int &dice) const;
+    static double Heuristica(const Parchis &estado, int jugador);
+
 };
 #endif

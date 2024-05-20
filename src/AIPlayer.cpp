@@ -199,7 +199,8 @@ void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
         thinkAleatorio(c_piece, id_piece, dice);
         break;
     case 1:
-        thinkAleatorioMasInteligente(c_piece, id_piece, dice);
+        Poda_AlfaBeta(*actual, jugador, 0, PROFUNDIDAD_ALFABETA, c_piece, id_piece, dice, menosinf, masinf, Heuristica);
+        // thinkAleatorioMasInteligente(c_piece, id_piece, dice);
         break;
     case 2:
         thinkAlfaBeta(c_piece, id_piece, dice);
@@ -259,9 +260,76 @@ double AIPlayer::ValoracionTest(const Parchis &estado, int jugador)
                     puntuacion_oponente++;
                 else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
                     puntuacion_oponente += 5;
-
         }
 
+        // Devuelvo la puntuación de mi jugador menos la puntuación del oponente.
+        return puntuacion_jugador - puntuacion_oponente;
+    }
+}
+
+double AIPlayer::Heuristica(const Parchis &estado, int jugador)
+{
+    // Heurística de prueba proporcionada para validar el funcionamiento del algoritmo de búsqueda.
+
+    int ganador = estado.getWinner();
+    int oponente = (jugador + 1) % 2;
+
+    // Si hay un ganador, devuelvo más/menos infinito, según si he ganado yo o el oponente.
+    if (ganador == jugador)
+        return gana;
+    else if (ganador == oponente)
+        return pierde;
+    else
+    {
+        // Colores que juega mi jugador y colores del oponente
+        vector<color> my_colors = estado.getPlayerColors(jugador);
+        vector<color> op_colors = estado.getPlayerColors(oponente);
+
+        // Recorro todas las fichas de mi jugador
+        int puntuacion_jugador = 0;
+        // Recorro colores de mi jugador.
+        for (int i = 0; i < my_colors.size(); i++)
+        {
+            color c = my_colors[i];
+            // Recorro las fichas de ese color.
+            for (int j = 0; j < num_pieces; j++)
+            {
+                puntuacion_jugador -= estado.distanceToGoal(c, j);
+                // Valoro positivamente que la ficha esté en casilla segura o meta.
+                if (estado.isSafePiece(c, j))
+                {
+                    puntuacion_jugador+=10;
+                    if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
+                        puntuacion_jugador += 20;
+                }
+                else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
+                    puntuacion_jugador += 50;
+            }
+        }
+
+        // Recorro todas las fichas del oponente
+        int puntuacion_oponente = 0;
+        // Recorro colores del oponente.
+        for (int i = 0; i < op_colors.size(); i++)
+        {
+            color c = op_colors[i];
+            // Recorro las fichas de ese color.
+            for (int j = 0; j < num_pieces; j++)
+            {
+                puntuacion_oponente -= estado.distanceToGoal(c, j);
+                if (estado.isSafePiece(c, j))
+                {
+                    // Valoro negativamente que la ficha esté en casilla segura o meta.
+                    puntuacion_oponente+=10;
+                    if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
+                        puntuacion_oponente += 20;
+                }
+                else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
+                    puntuacion_oponente += 50;
+            }
+        }
+        puntuacion_jugador += estado.getPowerBar(jugador).getPower();
+        puntuacion_oponente += estado.getPowerBar(oponente).getPower();
         // Devuelvo la puntuación de mi jugador menos la puntuación del oponente.
         return puntuacion_jugador - puntuacion_oponente;
     }
