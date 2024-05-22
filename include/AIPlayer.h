@@ -83,8 +83,9 @@ public:
     void thinkAleatorioMasInteligente(color &c_piece, int &id_piece, int &dice) const;
     void thinkFichaMasAdelantada(color &c_piece, int &id_piece, int &dice) const;
     void thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const;
-    void thinkAlfaBeta(color &c_piece, int &id_piece, int &dice) const;
+    void thinkAlfaBeta(color &c_piece, int &id_piece, int &dice, double (*heuristic)(const Parchis &, int)) const;
     static double Heuristica(const Parchis &estado, int jugador);
+    static double HeuristicaNotSafeBox(const Parchis &estado, int jugador);
 
 };
 #endif
