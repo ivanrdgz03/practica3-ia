@@ -53,8 +53,8 @@ public:
      * @param id_piece Id de la ficha
      * @param dice Número de dado
      */
-    virtual void think(color &c_piece, int &id_piece, int &dice) const;
-
+    virtual void think(color & c_piece,  int & id_piece, int & dice) const;
+    
     /**
      * @brief Método que determina si el player es inteligente (decide el mejor movimiento)
      * o no. True para AIPlayer.
