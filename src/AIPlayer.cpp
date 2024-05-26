@@ -374,7 +374,7 @@ double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador)
             puntuacion_colores[i] -= estado.distanceToGoal(c, j);
 
             // Segundo valor si esta en meta
-            box_type tipo_casilla = estado.getBoard().getPiece(c, j).get_box().type;
+            const box_type tipo_casilla = estado.getBoard().getPiece(c, j).get_box().type;
             if (tipo_casilla == goal)
                 puntuacion_colores[i] += 50;
             //Tercer valor si esta en casa
