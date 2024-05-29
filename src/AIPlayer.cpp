@@ -196,7 +196,8 @@ void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
     {
 
     case 0:
-        thinkAleatorio(c_piece, id_piece, dice);
+        thinkAlfaBeta(c_piece, id_piece, dice, ValoracionTest);
+        //thinkAleatorio(c_piece, id_piece, dice);
         break;
     case 1:
         thinkAlfaBeta(c_piece, id_piece, dice, Heuristica);
