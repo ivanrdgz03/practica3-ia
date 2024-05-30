@@ -87,6 +87,10 @@ public:
     static double Heuristica(const Parchis &estado, int jugador);
     static double PuntuacionJugador(const Parchis &estado, const int& jugador);
     static double Heuristica2(const Parchis &estado, int jugador);
+    static double HeuristicaPruebas(const Parchis &estado, int jugador);
+        static double PuntuacionJugadorPruebas(const Parchis &estado, const int& jugador);
+
+
 
 };
 #endif
