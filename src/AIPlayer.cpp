@@ -152,8 +152,11 @@ double AIPlayer::Poda_AlfaBeta(const Parchis &actual, const int &jugador, const 
 {
     if (profundidad == profundidad_max || actual.gameOver())
         return heuristic(actual, jugador);
+
     double salida = menosinf;
+
     ParchisBros hijos = actual.getChildren();
+    
     if (jugador == actual.getCurrentPlayerId())
         for (ParchisBros::Iterator it = hijos.begin(); it != hijos.end(); ++it)
         {
@@ -399,16 +402,16 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
     case red:
     case yellow:
         if (estado.eatenPiece().first == blue || estado.eatenPiece().first == green)
-            comer += 15;
+            comer += 20;
         else if (estado.eatenPiece().first != none)
-            comer -= 15;
+            comer -= 20;
         break;
     case green:
     case blue:
         if (estado.eatenPiece().first == red || estado.eatenPiece().first == yellow)
-            comer += 15;
+            comer += 20;
         else if (estado.eatenPiece().first != none)
-            comer -= 15;
+            comer -= 20;
         break;
     }
     double destruidas = 0;
@@ -419,16 +422,16 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
         case red:
         case yellow:
             if (estado.getCurrentColor() == blue || estado.getCurrentColor() == green)
-                destruidas += 15;
+                destruidas += 20;
             else
-                destruidas -= 15;
+                destruidas -= 20;
             break;
         case green:
         case blue:
             if (estado.getCurrentColor() == red || estado.getCurrentColor() == yellow)
-                destruidas += 15;
+                destruidas += 20;
             else
-                destruidas -= 15;
+                destruidas -= 20;
             break;
         }
     }
@@ -510,10 +513,10 @@ double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador)
             // Segundo valor si esta en meta
             const box_type tipo_casilla = estado.getBoard().getPiece(c, j).get_box().type;
             if (tipo_casilla == goal)
-                puntuacion_colores[i] += 50;
+                puntuacion_colores[i] += 60;
             // Tercer valor si esta en casa
             else if (tipo_casilla == home)
-                puntuacion_colores[i] -= 50;
+                puntuacion_colores[i] -= 60;
             // Cuarto valor si esta en casilla segura o formando muro
             /*else if (estado.isSafePiece(c, j))
             {
