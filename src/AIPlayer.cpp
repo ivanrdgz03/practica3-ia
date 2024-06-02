@@ -402,20 +402,20 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
     case red:
     case yellow:
         if (estado.eatenPiece().first == blue || estado.eatenPiece().first == green)
-            comer += 20;
+            comer += 40;
         else if (estado.eatenPiece().first != none)
-            comer -= 20;
+            comer -= 40;
         break;
     case green:
     case blue:
         if (estado.eatenPiece().first == red || estado.eatenPiece().first == yellow)
-            comer += 20;
+            comer += 40;
         else if (estado.eatenPiece().first != none)
-            comer -= 20;
+            comer -= 40;
         break;
     }
     double destruidas = 0;
-    for (const pair<color, int> &i : estado.piecesDestroyedLastMove())
+    /*for (const pair<color, int> &i : estado.piecesDestroyedLastMove())
     {
         switch (i.first)
         {
@@ -434,7 +434,7 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
                 destruidas -= 20;
             break;
         }
-    }
+    }*/
     for (int i = 0; i < estado.getPlayerColors(jugador).size(); ++i)
     {
         color c = estado.getPlayerColors(jugador)[i];
