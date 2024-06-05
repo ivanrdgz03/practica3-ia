@@ -143,12 +143,12 @@ void AIPlayer::thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const
     }
 }
 
-void AIPlayer::thinkAlfaBeta(color &c_piece, int &id_piece, int &dice, double (*heuristic)(const Parchis &, int)) const
+double AIPlayer::thinkAlfaBeta(color &c_piece, int &id_piece, int &dice, double (*heuristic)(const Parchis &, int)) const
 {
     double alpha = menosinf;
     double beta = masinf;
-    int profundidad_inicial = 0;
-    Poda_AlfaBeta(*actual, jugador, profundidad_inicial, PROFUNDIDAD_ALFABETA, c_piece, id_piece, dice, alpha, beta, heuristic);
+    const int PROFUNDIDAD_INICIAL = 0;
+    return Poda_AlfaBeta(*actual, this->jugador, PROFUNDIDAD_INICIAL, PROFUNDIDAD_ALFABETA, c_piece, id_piece, dice, alpha, beta, heuristic);
 }
 
 double AIPlayer::Poda_AlfaBeta(const Parchis &actual, const int &jugador, const int &profundidad, const int &profundidad_max, color &c_piece, int &id_piece, int &dice, double alpha, double beta, double (*heuristic)(const Parchis &, int)) const
@@ -200,24 +200,17 @@ void AIPlayer::think(color &c_piece, int &id_piece, int &dice) const
 {
     switch (id)
     {
-
     case 0:
         thinkAlfaBeta(c_piece, id_piece, dice, ValoracionTest);
-        // thinkAleatorio(c_piece, id_piece, dice);
         break;
     case 1:
-        thinkAlfaBeta(c_piece, id_piece, dice, Heuristica);
-        // Poda_AlfaBeta(*actual, jugador, 0, PROFUNDIDAD_ALFABETA, c_piece, id_piece, dice, menosinf, masinf, Heuristica);
-        //  thinkAleatorioMasInteligente(c_piece, id_piece, dice);
+        thinkAlfaBeta(c_piece, id_piece, dice, Heuristica); // Esta es la mejor
         break;
     case 2:
-        thinkAlfaBeta(c_piece, id_piece, dice, Heuristica2);
-        // thinkFichaMasAdelantada(c_piece, id_piece, dice);
+        thinkFichaMasAdelantada(c_piece, id_piece, dice);
         break;
     case 3:
-        // Esta es la que mejor actualmente
-        thinkAlfaBeta(c_piece, id_piece, dice, HeuristicaPruebas);
-        // thinkMejorOpcion(c_piece, id_piece, dice);
+        thinkMejorOpcion(c_piece, id_piece, dice);
         break;
     }
 }
@@ -281,8 +274,8 @@ double AIPlayer::Heuristica(const Parchis &estado, int jugador)
 {
     // Heurística de prueba proporcionada para validar el funcionamiento del algoritmo de búsqueda.
 
-    int ganador = estado.getWinner();
-    int oponente = (jugador + 1) % 2;
+    const int ganador = estado.getWinner();
+    const int oponente = (jugador + 1) % 2;
 
     // Si hay un ganador, devuelvo más/menos infinito, según si he ganado yo o el oponente.
     if (ganador == jugador)
@@ -291,124 +284,32 @@ double AIPlayer::Heuristica(const Parchis &estado, int jugador)
         return pierde;
     else
     {
-        // Colores que juega mi jugador y colores del oponente
-        vector<color> my_colors = estado.getPlayerColors(jugador);
-        vector<color> op_colors = estado.getPlayerColors(oponente);
-
-        // Recorro todas las fichas de mi jugador
-        int puntuacion_jugador = 0;
-        // Recorro colores de mi jugador.
-        for (int i = 0; i < my_colors.size(); i++)
-        {
-            color c = my_colors[i];
-            // Recorro las fichas de ese color.
-            for (int j = 0; j < num_pieces; j++)
-            {
-                puntuacion_jugador -= estado.distanceToGoal(c, j);
-                // Valoro positivamente que la ficha esté en casilla segura o meta.
-                if (estado.isSafePiece(c, j))
-                {
-                    puntuacion_jugador += 1;
-                    if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
-                        puntuacion_jugador += 3;
-                    else if (estado.isSafePiece(c, j))
-                        puntuacion_jugador += 2;
-                }
-                else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
-                    puntuacion_jugador += 10;
-            }
-        }
-
-        // Recorro todas las fichas del oponente
-        int puntuacion_oponente = 0;
-        // Recorro colores del oponente.
-        for (int i = 0; i < op_colors.size(); i++)
-        {
-            color c = op_colors[i];
-            // Recorro las fichas de ese color.
-            for (int j = 0; j < num_pieces; j++)
-            {
-                puntuacion_oponente -= estado.distanceToGoal(c, j);
-                if (estado.isSafePiece(c, j))
-                {
-                    // Valoro negativamente que la ficha esté en casilla segura o meta.
-                    puntuacion_oponente += 1;
-                    if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
-                        puntuacion_oponente += 3;
-                    else if (estado.isSafePiece(c, j))
-                        puntuacion_oponente += 2;
-                }
-                else if (estado.getBoard().getPiece(c, j).get_box().type == goal)
-                    puntuacion_oponente += 10;
-            }
-        }
-        /*puntuacion_jugador += estado.getPowerBar(jugador).getPower();
-        puntuacion_oponente += estado.getPowerBar(oponente).getPower();*/
-        // Devuelvo la puntuación de mi jugador menos la puntuación del oponente.
-        return puntuacion_jugador - puntuacion_oponente;
-    }
-}
-
-double AIPlayer::Heuristica2(const Parchis &estado, int jugador)
-{
-    // Heurística de prueba proporcionada para validar el funcionamiento del algoritmo de búsqueda.
-
-    int ganador = estado.getWinner();
-    int oponente = (jugador + 1) % 2;
-
-    // Si hay un ganador, devuelvo más/menos infinito, según si he ganado yo o el oponente.
-    if (ganador == jugador)
-        return gana;
-    else if (ganador == oponente)
-        return pierde;
-    else
-    {
-        double puntuacion_jugador = PuntuacionJugador(estado, jugador);
+        double puntuacion_jugador = PuntuacionJugador(estado, jugador, true);
         double puntuacion_oponente = PuntuacionJugador(estado, oponente);
 
         return puntuacion_jugador - puntuacion_oponente;
     }
 }
 
-double AIPlayer::HeuristicaPruebas(const Parchis &estado, int jugador)
-{
-    // Heurística de prueba proporcionada para validar el funcionamiento del algoritmo de búsqueda.
-
-    int ganador = estado.getWinner();
-    int oponente = (jugador + 1) % 2;
-
-    // Si hay un ganador, devuelvo más/menos infinito, según si he ganado yo o el oponente.
-    if (ganador == jugador)
-        return gana;
-    else if (ganador == oponente)
-        return pierde;
-    else
-    {
-        double puntuacion_jugador = PuntuacionJugadorPruebas(estado, jugador, true);
-        double puntuacion_oponente = PuntuacionJugadorPruebas(estado, oponente);
-
-        return puntuacion_jugador - puntuacion_oponente;
-    }
-}
-
-double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &jugador, const bool &esJugador)
+double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador, const bool &esJugador)
 {
     const double COLOR_GANADOR = 1.8, COLOR_PERDEDOR = 0.5;
+    const double PODER = estado.getPower(jugador);
+    const color color_actual = estado.getCurrentColor();
     double puntuacion = 0, puntuacion_colores[estado.getPlayerColors(jugador).size()] = {100};
-    const double poder = estado.getPower(jugador);
     double bonif_comer = 15, bonif_destruir = 35, bonif_casilla = 20;
     if ((esJugador && jugador == 1) || (!esJugador && jugador == 0))
     {
         bonif_comer = 35;
         bonif_destruir = 15;
         bonif_casilla = 50;
-        puntuacion += poder;
+        puntuacion += PODER;
     }
 
     // Comerse fichas
     double comer = 0;
-    tuple<color, int, int> last_action = estado.getLastAction();
-    switch (get<0>(last_action))
+    const color ultimo_color = get<0>(estado.getLastAction());
+    switch (ultimo_color)
     {
     case red:
     case yellow:
@@ -426,20 +327,20 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
         break;
     }
     double destruidas = 0;
-    for (const pair<color, int> &i : estado.piecesDestroyedLastMove())
+    for (const pair<color, int> &pieza : estado.piecesDestroyedLastMove())
     {
-        switch (i.first)
+        switch (pieza.first)
         {
         case red:
         case yellow:
-            if (estado.getCurrentColor() == blue || estado.getCurrentColor() == green)
+            if (color_actual == blue || color_actual == green)
                 destruidas += bonif_destruir;
             else
                 destruidas -= bonif_destruir;
             break;
         case green:
         case blue:
-            if (estado.getCurrentColor() == red || estado.getCurrentColor() == yellow)
+            if (color_actual == red || color_actual == yellow)
                 destruidas += bonif_destruir;
             else
                 destruidas -= bonif_destruir;
@@ -448,99 +349,56 @@ double AIPlayer::PuntuacionJugadorPruebas(const Parchis &estado, const int &juga
     }
     for (int i = 0; i < estado.getPlayerColors(jugador).size(); ++i)
     {
-        color c = estado.getPlayerColors(jugador)[i];
+        const color c = estado.getPlayerColors(jugador)[i];
         for (int j = 0; j < num_pieces; ++j)
         {
             // Primer valor distancia
             puntuacion_colores[i] -= estado.distanceToGoal(c, j);
 
-            // Segundo valor si esta en meta
             const box_type tipo_casilla = estado.getBoard().getPiece(c, j).get_box().type;
+
+            // Segundo valor si esta en meta
             if (tipo_casilla == goal)
                 puntuacion_colores[i] += bonif_casilla;
             // Tercer valor si esta en casa
             else if (tipo_casilla == home)
                 puntuacion_colores[i] -= bonif_casilla;
-
-            // Cuarto valor si esta en casilla segura o formando muro
-            /*else if (estado.isSafePiece(c, j))
-            {
-                puntuacion_colores[i] += 4;
-                /*if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
-                    puntuacion_colores[i] += 3;
-            }*/
         }
     }
+
     if (puntuacion_colores[0] > puntuacion_colores[1])
         puntuacion += COLOR_GANADOR * puntuacion_colores[0] + COLOR_PERDEDOR * puntuacion_colores[1];
     else
         puntuacion += COLOR_GANADOR * puntuacion_colores[1] + COLOR_PERDEDOR * puntuacion_colores[0];
 
-    if (poder < 50)
+    if (PODER < 50)
         puntuacion += 10;
-    else if (poder < 60)
+    else if (PODER < 60)
         puntuacion += 25;
-    else if (poder < 65)
+    else if (PODER < 65)
         puntuacion -= 50;
-    else if (poder < 70)
+    else if (PODER < 70)
         puntuacion += 40;
-    else if (poder < 75)
+    else if (PODER < 75)
         puntuacion += 25;
-    else if (poder < 80)
+    else if (PODER < 80)
         puntuacion += 60;
-    else if (poder < 85)
+    else if (PODER < 85)
         puntuacion -= 60;
-    else if (poder < 90)
+    else if (PODER < 90)
     {
         puntuacion += 60;
-        if ((estado.getCurrentColor() == red || estado.getCurrentColor() == yellow) && (estado.piecesAtGoal(green) == 2 || estado.piecesAtGoal(blue) == 2))
+        if ((color_actual == yellow || color_actual == red) && (estado.piecesAtGoal(green) == 2 || estado.piecesAtGoal(blue) == 2))
             puntuacion += 30;
-        else if ((estado.getCurrentColor() == green || estado.getCurrentColor() == blue) && (estado.piecesAtGoal(yellow) == 2 || estado.piecesAtGoal(red) == 2))
+        else if ((color_actual == green || color_actual == blue) && (estado.piecesAtGoal(yellow) == 2 || estado.piecesAtGoal(red) == 2))
             puntuacion += 30;
     }
-    else if (poder < 95)
+    else if (PODER < 95)
         puntuacion -= 70;
-    else if (poder < 100)
+    else if (PODER < 100)
         puntuacion += 80;
     else
         puntuacion -= 80;
 
     return (puntuacion + ((comer + destruidas) * (COLOR_GANADOR + COLOR_PERDEDOR)));
-}
-
-double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador)
-{
-    const double COLOR_GANADOR = 1.4, COLOR_PERDEDOR = 0.5;
-    double puntuacion, puntuacion_colores[estado.getPlayerColors(jugador).size()] = {100};
-    for (int i = 0; i < estado.getPlayerColors(jugador).size(); ++i)
-    {
-        color c = estado.getPlayerColors(jugador)[i];
-        for (int j = 0; j < num_pieces; ++j)
-        {
-            // Primer valor distancia
-            puntuacion_colores[i] -= estado.distanceToGoal(c, j);
-
-            // Segundo valor si esta en meta
-            const box_type tipo_casilla = estado.getBoard().getPiece(c, j).get_box().type;
-            if (tipo_casilla == goal)
-                puntuacion_colores[i] += 50;
-            // Tercer valor si esta en casa
-            else if (tipo_casilla == home)
-                puntuacion_colores[i] -= 50;
-            // Cuarto valor si esta en casilla segura o formando muro
-            /*else if (estado.isSafePiece(c, j))
-            {
-                puntuacion_colores[i] += 4;
-                if (estado.isWall(estado.getBoard().getPiece(c, j).get_box()) == c)
-                    puntuacion_colores[i] += 5;
-            }*/
-        }
-    }
-    puntuacion = (double)estado.getPower(jugador);
-    if (puntuacion_colores[0] > puntuacion_colores[1])
-        puntuacion += COLOR_GANADOR * puntuacion_colores[0] + COLOR_PERDEDOR * puntuacion_colores[1];
-    else
-        puntuacion += COLOR_GANADOR * puntuacion_colores[1] + COLOR_PERDEDOR * puntuacion_colores[0];
-
-    return puntuacion;
 }

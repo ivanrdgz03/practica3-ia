@@ -82,14 +82,11 @@ public:
     void thinkAleatorioMasInteligente(color &c_piece, int &id_piece, int &dice) const;
     void thinkFichaMasAdelantada(color &c_piece, int &id_piece, int &dice) const;
     void thinkMejorOpcion(color &c_piece, int &id_piece, int &dice) const;
-    void thinkAlfaBeta(color &c_piece, int &id_piece, int &dice, double (*heuristic)(const Parchis &, int)) const;
+
+    double thinkAlfaBeta(color &c_piece, int &id_piece, int &dice, double (*heuristic)(const Parchis &, int)) const;
+
     static double Heuristica(const Parchis &estado, int jugador);
-    static double PuntuacionJugador(const Parchis &estado, const int& jugador);
-    static double Heuristica2(const Parchis &estado, int jugador);
-    static double HeuristicaPruebas(const Parchis &estado, int jugador);
-    static double PuntuacionJugadorPruebas(const Parchis &estado, const int& jugador, const bool& esJugador = false);
-
-
+    static double PuntuacionJugador(const Parchis &estado, const int& jugador, const bool& esJugador = false);
 
 };
 #endif
