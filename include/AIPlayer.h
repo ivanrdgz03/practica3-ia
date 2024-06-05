@@ -9,7 +9,6 @@ class AIPlayer : public Player
 protected:
     // Id identificativo del jugador
     const int id;
-
 public:
     /**
      * @brief Constructor de un objeto AIPlayer
@@ -88,7 +87,7 @@ public:
     static double PuntuacionJugador(const Parchis &estado, const int& jugador);
     static double Heuristica2(const Parchis &estado, int jugador);
     static double HeuristicaPruebas(const Parchis &estado, int jugador);
-        static double PuntuacionJugadorPruebas(const Parchis &estado, const int& jugador);
+    static double PuntuacionJugadorPruebas(const Parchis &estado, const int& jugador, const bool& esJugador = false);
 
 
 
