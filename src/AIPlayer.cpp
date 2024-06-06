@@ -291,7 +291,7 @@ double AIPlayer::Heuristica(const Parchis &estado, int jugador)
 double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador, const bool &esJugador)
 {
     const double COEF_GANADOR = 1.8, COEF_PERDEDOR = 0.5;
-    const double PODER = estado.getPower(jugador);
+    const int PODER = estado.getPower(jugador);
     const color color_actual = estado.getCurrentColor();
     double puntuacion = 0, puntuacion_colores[estado.getPlayerColors(jugador).size()] = {100};
     double bonif_comer = 15, bonif_destruir = 35, bonif_casilla = 20;
