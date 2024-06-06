@@ -324,28 +324,7 @@ double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador, co
             comer -= bonif_comer;
         break;
     }
-    // Fichas destruidas por dados especiales en el último turno
-    double destruidas = 0;
-    for (const pair<color, int> &pieza : estado.piecesDestroyedLastMove())
-    {
-        switch (pieza.first)
-        {
-        case red:
-        case yellow:
-            if (color_actual == blue || color_actual == green)
-                destruidas += bonif_destruir;
-            else
-                destruidas -= bonif_destruir;
-            break;
-        case green:
-        case blue:
-            if (color_actual == red || color_actual == yellow)
-                destruidas += bonif_destruir;
-            else
-                destruidas -= bonif_destruir;
-            break;
-        }
-    }
+
     for (int i = 0; i < estado.getPlayerColors(jugador).size(); ++i)
     {
         const color c = estado.getPlayerColors(jugador)[i];
@@ -399,5 +378,5 @@ double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador, co
     else
         puntuacion -= 80;
 
-    return (puntuacion + ((comer + destruidas) * (COEF_GANADOR + COEF_PERDEDOR)));
+    return (puntuacion + (comer * (COEF_GANADOR + COEF_PERDEDOR)));
 }
