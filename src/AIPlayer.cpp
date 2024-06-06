@@ -380,7 +380,7 @@ double AIPlayer::PuntuacionJugador(const Parchis &estado, const int &jugador, co
     else if (PODER < 70)
         puntuacion += 40;
     else if (PODER < 75)
-        puntuacion += 25;
+        puntuacion += 30;
     else if (PODER < 80)
         puntuacion += 60;
     else if (PODER < 85)
